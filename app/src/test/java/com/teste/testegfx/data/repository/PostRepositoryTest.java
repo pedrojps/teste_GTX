@@ -33,7 +33,7 @@ public class PostRepositoryTest {
 
         // Act
         List<Post> result =
-                repository.filterEvenId(posts);
+                repository.filterEvenIds(posts);
 
         // Assert
         assertEquals(2, result.size());

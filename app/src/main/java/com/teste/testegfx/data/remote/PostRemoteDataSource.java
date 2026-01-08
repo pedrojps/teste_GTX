@@ -1,46 +1,43 @@
 package com.teste.testegfx.data.remote;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.teste.testegfx.data.model.Post;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
+import com.teste.testegfx.data.common.Callback;
+
+
+import java.util.concurrent.Executor;
+
 
 public class PostRemoteDataSource implements PostDataSource {
 
     private final PostApi api;
+    private final Executor executor;
 
-    public PostRemoteDataSource(PostApi api) {
+    public PostRemoteDataSource(PostApi api, Executor executor) {
         this.api = api;
+        this.executor = executor;
     }
 
     @Override
-    public LiveData<List<Post>> getPosts() {
-        MutableLiveData<List<Post>> liveData = new MutableLiveData<>();
+    public void fetchPosts(Callback<List<Post>> callback) {
+        executor.execute(() -> {
+            try {
+                Response<List<Post>> response = api.getPosts().execute();
 
-        api.getPosts().enqueue(new Callback<List<Post>>() {
-            @Override
-            public void onResponse(
-                    Call<List<Post>> call,
-                    Response<List<Post>> response
-            ) {
                 if (response.isSuccessful() && response.body() != null) {
-                    liveData.setValue(response.body());
+                    callback.onSuccess(response.body());
                 } else {
-                    liveData.setValue(null);
+                    callback.onError(
+                            new Exception("Erro na resposta da API")
+                    );
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Post>> call, Throwable t) {
-                liveData.setValue(null);
+            } catch (Exception e) {
+                callback.onError(e);
             }
         });
-
-        return liveData;
     }
+
 }

@@ -6,16 +6,35 @@ import com.teste.testegfx.data.remote.PostDataSource;
 import com.teste.testegfx.data.remote.PostRemoteDataSource;
 import com.teste.testegfx.data.repository.PostRepository;
 
-public final class AppModule {
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-    private AppModule() {
+
+public class AppModule {
+
+    private static Executor executor;
+
+    private static Executor provideExecutor() {
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+        }
+        return executor;
+    }
+
+    public static PostApi providePostApi() {
+        return ApiClient.create(PostApi.class);
+    }
+
+    public static PostDataSource providePostRemoteDataSource() {
+        return new PostRemoteDataSource(
+                providePostApi(),
+                provideExecutor()
+        );
     }
 
     public static PostRepository providePostRepository() {
-        PostApi api = ApiClient.create(PostApi.class);
-        PostDataSource remote =
-                new PostRemoteDataSource(api);
-
-        return new PostRepository(remote);
+        return new PostRepository(
+                providePostRemoteDataSource()
+        );
     }
 }

@@ -39,15 +39,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        MainViewModelFactory factory =
-                new MainViewModelFactory(
-                        AppModule.providePostRepository()
-                );
+        viewModel = new ViewModelProvider(
+                this,
+                new MainViewModelFactory()
+        ).get(MainViewModel.class);
 
-        viewModel = new ViewModelProvider(this, factory)
-                .get(MainViewModel.class);
-
-        viewModel.loadPosts();
+        viewModel.getPosts().observe(this, posts -> {
+            adapter.submitList(posts);
+        });
     }
 
     private void setupObservers() {
