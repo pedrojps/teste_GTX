@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "title": "Post de teste",
+    "body": "Conteúdo do post"
+  },
+  {
+    "id": 2,
+    "title": "Outro post",
+    "body": "Mais conteúdo"
+  }
+]
